@@ -2539,6 +2539,21 @@ function standaloneHtml(){readCfg();const C=JSON.stringify(cfg).replace(/</g,'\\
 function downloadText(name,text){const u=URL.createObjectURL(new Blob([text],{type:'text/html;charset=utf-8'})),a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1500)}
 function updatePreview(){readCfg();const f=document.getElementById('v15PortalPreview');if(f)f.srcdoc=standaloneHtml();const s=document.getElementById('v15ResultStatus');if(s)s.textContent=exampleIsLoaded()?'WORKING EXAMPLE · DON ESPADÍN':'LIVE CONFIGURATION'}
 function buildStudio(){const page=document.querySelector('.page[data-page="portal"]');if(!page)return;page.querySelector('.v15PortalStudio')?.remove();const academic=page.querySelector('.v15Academic')||page.querySelector('.pagehead')||page.firstElementChild;if(!academic)return;const box=document.createElement('section');box.className='v15PortalStudio';box.innerHTML=`<div class="v15PortalSource"><div><strong>Design source · Sales Experience HTML ${tinyInfo('Sales Experience HTML','The supplier portal example inherits brand tokens and visual assets from the final Sales experience so customer-facing and supplier-facing touchpoints remain coherent.')}</strong><span>For the working example, the portal inherits the design language and brand assets from the upstream Sales HTML. A user can replace these values with their own identity.</span></div><a href="https://sales-tau-bay.vercel.app/" target="_blank" rel="noreferrer">Open Sales source ↗</a></div><div class="v15PortalStudioGrid"><aside class="v15PortalConfigurator"><div class="v15CfgHead"><small>CONFIGURATOR</small><h3>Supplier Portal design & governance</h3><p>Configure the identity, role context and visible modules. The result on the right is the actual standalone HTML that this pill will deliver.</p></div><div class="v15CfgBody"><div class="v15CfgGroup"><h4>1 · Identity</h4><div class="v15CfgFields"><div class="v15CfgField full"><label>Company / Buyer name</label><input id="v15Company"></div><div class="v15CfgField full"><label>Portal title</label><input id="v15Title"></div><div class="v15CfgField full"><label>Portal subtitle</label><input id="v15Subtitle"></div><div class="v15CfgField full"><label>Company logo URL</label><input id="v15Logo"></div><div class="v15CfgField full"><label>Cover image URL</label><input id="v15Cover"></div></div></div><div class="v15CfgGroup"><h4>2 · Look & feel</h4><div class="v15ColorRow"><div class="v15CfgField"><label>Primary colour</label><input id="v15Primary" type="color"></div><div class="v15CfgField"><label>Secondary colour</label><input id="v15Secondary" type="color"></div><div class="v15CfgField"><label>Background colour</label><input id="v15Bg" type="color"></div></div></div><div class="v15CfgGroup"><h4>3 · Operating access</h4><div class="v15CfgFields"><div class="v15CfgField full"><label>Buyer / COO label</label><input id="v15BuyerLabel"></div><div class="v15CfgField full"><label>Default supplier</label><select id="v15Supplier"></select></div></div></div><div class="v15CfgGroup"><h4>4 · Portal modules</h4><div class="v15ModuleList">${[['overview','Overview'],['po','Purchase Orders'],['sla','SLA & Evidence'],['incidents','Incidents'],['rma','Returns / RMA'],['receiving','Receiving'],['invoices','Invoices'],['evidence','Data & Evidence']].map(x=>'<label><input type="checkbox" data-v15module="'+x[0]+'" checked> '+x[1]+'</label>').join('')}</div></div><div class="v15CfgActions"><button id="v15DonStyle" type="button">Use loaded example design</button><button id="v15ApplyPortal" type="button">Apply configuration</button><button class="primary" id="v15DownloadPortal" type="button">Download standalone Supplier Portal HTML</button></div></div></aside><div class="v15PortalResult"><div class="v15ResultHead"><div><h3>Live Supplier Portal simulator</h3><p>Use both roles. The same operating evidence is presented differently to Buyer / COO and Supplier.</p></div><span class="v15ResultStatus" id="v15ResultStatus"></span></div><div class="v15PortalBrowser"><div class="v15BrowserBar"><i></i><i></i><i></i><span>Supplier Portal · standalone HTML preview</span></div><iframe id="v15PortalPreview" class="v15PortalFrame" title="Supplier Portal live simulator"></iframe></div><div class="v15PortalNotes"><div class="v15PortalNote"><b>Buyer / COO</b><span>Portfolio-wide commitments, supplier status, SLA, exceptions and financial visibility.</span></div><div class="v15PortalNote"><b>Supplier</b><span>Only the selected supplier scope: assigned PO, SLA, evidence and actions.</span></div><div class="v15PortalNote"><b>Messaging</b><span>Visualized as the collaboration channel between both roles; backend messaging is intentionally not active yet.</span></div></div></div></div>`;academic.insertAdjacentElement('afterend',box);supplierOptions();fillCfg(exampleIsLoaded()?DON_CFG:DEFAULT_CFG);supplierOptions();if(exampleIsLoaded()){const ss=document.getElementById('v15Supplier');if(ss&&state.suppliers?.length){ss.value=state.suppliers[0].supplier_id;cfg.defaultSupplier=ss.value}}decorateInfo(box);document.getElementById('v15DonStyle').onclick=()=>{fillCfg(DON_CFG);supplierOptions();updatePreview()};document.getElementById('v15ApplyPortal').onclick=updatePreview;document.getElementById('v15DownloadPortal').onclick=()=>{readCfg();const slug=(cfg.companyName||'Company').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').toUpperCase();downloadText((slug||'COMPANY')+'_SUPPLIER_PORTAL.html',standaloneHtml())};box.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',()=>{readCfg();updatePreview()}));updatePreview()}
+
+/* V27 · expose the LIVE / OPEN supplier portal as a second, independent deliverable. */
+window.__docroiOpenSupplierPortalHtml=standaloneHtml;
+window.downloadOpenSupplierPortal=function(){
+  readCfg();
+  const slug=(cfg.companyName||'Company').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').toUpperCase();
+  downloadText((slug||'COMPANY')+'_SUPPLIER_PORTAL_OPEN.html',standaloneHtml());
+};
+window.previewOpenSupplierPortal=function(){
+  if(typeof setPage==='function')setPage('portal');
+  setTimeout(()=>{
+    const f=document.getElementById('v15PortalPreview');
+    if(f){updatePreview();f.scrollIntoView({behavior:'smooth',block:'start'});}
+  },160);
+};
 function header(){const brand=document.querySelector('.docroiSiteBrand');if(brand){brand.href='https://doc-roi-my-cabinet.vercel.app/';brand.target='_blank';brand.removeAttribute('data-scroll-target')}const met=document.getElementById('v15Methodology'),res=document.getElementById('v15Resources'),load=document.getElementById('v15LoadExample'),reset=document.getElementById('v15Reset'),open=document.getElementById('openToolBtn');if(met)met.onclick=()=>{const a=document.querySelector('.page.active .v15Academic');a?.scrollIntoView({behavior:'smooth',block:'start'})};if(res)res.onclick=()=>document.getElementById('resources')?.scrollIntoView({behavior:'smooth',block:'start'});if(load)load.onclick=()=>window.loadExample();if(reset)reset.onclick=()=>window.resetAll();if(open)open.onclick=()=>{setPage('inputs');document.getElementById('toolStart')?.scrollIntoView({behavior:'smooth',block:'start'})}}
 function init(){installAcademic();buildStudio();decorateInfo();header()}
 const oldLoad=window.loadExample;window.loadExample=function(){const r=oldLoad.apply(this,arguments);setTimeout(()=>{installAcademic();buildStudio();fillCfg(DON_CFG);supplierOptions();updatePreview();decorateInfo();},500);return r};
@@ -3423,4 +3438,53 @@ async function handleLabelSourceUpload(file){try{const name=(file.name||'').toLo
   background:linear-gradient(90deg,rgba(0,36,58,.16) 0%,rgba(0,36,58,.06) 56%,rgba(0,0,0,.06) 100%)!important;
 }
 </style>
+
+<style id="docroi-v27-dual-supplier-output-css">
+#supplierPortalHtmlOutput .door{background:#10202b!important;color:#fff!important;border-color:#10202b!important}
+#supplierPortalOpenOutput{order:999;border-color:#bfd9e7}
+#supplierPortalOpenOutput .door{background:#0a6fae!important;color:#fff!important;border-color:#0a6fae!important}
+#supplierPortalOpenOutput .v27OutputNote,#supplierPortalHtmlOutput .v27OutputNote{display:block;margin-top:6px;font-size:9px;line-height:1.45;color:#6a7c89}
+#supplierPortalOpenOutput .toolbar,#supplierPortalHtmlOutput .toolbar{margin-top:12px}
+</style>
+<script id="docroi-v27-dual-supplier-output-runtime">
+(function(){
+'use strict';
+function install(){
+  const grid=document.querySelector('.page[data-page="outputs"] .outputGrid');
+  if(!grid)return;
+  const access=document.getElementById('supplierPortalHtmlOutput');
+  if(access){
+    const door=access.querySelector('.door'),h=access.querySelector('h4'),p=access.querySelector('p');
+    if(door)door.textContent='SP · ACCESS';
+    if(h)h.textContent='Supplier Portal · Access Gateway';
+    if(p)p.innerHTML='Login / access shell for Buyer / COO and Supplier roles. It validates the prototype credentials and then opens the role-filtered supplier workspace.<span class="v27OutputNote">Piece 1 of 2 · controlled access layer.</span>';
+    const prev=document.getElementById('outputSupplierPreview'),down=document.getElementById('outputSupplierDownload');
+    if(prev)prev.textContent='Preview access';
+    if(down)down.textContent='Download access HTML';
+  }
+  let open=document.getElementById('supplierPortalOpenOutput');
+  if(!open){
+    open=document.createElement('div');
+    open.className='outputCard portalOutputCard';
+    open.id='supplierPortalOpenOutput';
+    open.innerHTML='<div class="door">SP · OPEN</div><h4>Supplier Portal · Open Workspace</h4><p>The same interactive portal shown in the live preview: cover, Buyer / COO view, Supplier view, process navigation, PO, SLA, incidents, RMA, receiving, invoices, evidence, Kanban and collaboration channel.<span class="v27OutputNote">Piece 2 of 2 · open operational portal, without the separate credential gateway.</span></p><div class="toolbar"><button class="btn blue" id="outputSupplierOpenPreview" type="button">Preview open portal</button><button class="btn secondary" id="outputSupplierOpenDownload" type="button">Download open HTML</button></div>';
+    grid.appendChild(open);
+  }
+  const p=document.getElementById('outputSupplierOpenPreview');
+  const d=document.getElementById('outputSupplierOpenDownload');
+  if(p)p.onclick=()=>{if(typeof window.previewOpenSupplierPortal==='function')window.previewOpenSupplierPortal()};
+  if(d)d.onclick=()=>{if(typeof window.downloadOpenSupplierPortal==='function')window.downloadOpenSupplierPortal()};
+}
+const oldLoad=window.loadExample;
+if(typeof oldLoad==='function'&&!oldLoad.__v27){
+  const wrapped=function(){const r=oldLoad.apply(this,arguments);setTimeout(install,900);return r};wrapped.__v27=true;window.loadExample=wrapped;
+}
+const oldReset=window.resetAll;
+if(typeof oldReset==='function'&&!oldReset.__v27){
+  const wrapped=function(){const r=oldReset.apply(this,arguments);setTimeout(install,900);return r};wrapped.__v27=true;window.resetAll=wrapped;
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>setTimeout(install,1300));else setTimeout(install,1300);
+setTimeout(install,2600);
+})();
+</script>
 </body></html>
